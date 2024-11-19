@@ -2,6 +2,7 @@
 using Amazon.Lambda.Core;
 using Domain;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -10,7 +11,7 @@ namespace Subscribe
 {
     public class Function
     {
-        private static MongoClient? _mongoClient;
+        private static readonly MongoClient? MongoClient;
 
         private static MongoClient CreateMongoClient()
         {
@@ -21,11 +22,11 @@ namespace Subscribe
 
         static Function()
         {
-            _mongoClient = CreateMongoClient();
+            MongoClient = CreateMongoClient();
         }
         public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
-            if (_mongoClient == null)
+            if (MongoClient == null)
             {
                 context.Logger.LogError("Database client is not initialized");
                 return new APIGatewayProxyResponse
@@ -35,23 +36,41 @@ namespace Subscribe
                 };
             }
             
-            var database = _mongoClient.GetDatabase("rebuild-test");
+            var database = MongoClient.GetDatabase("rebuild-test");
             var clientCollection = database.GetCollection<Client>("clients");
             try
             {
                 var connectionId = request.RequestContext.ConnectionId;
                 context.Logger.LogLine($"ConnectionId: {connectionId}");
-                var client = new Client(connectionId);
+                var message = JsonConvert.DeserializeObject<SubscribeMessage>(request.Body);
+                if (message?.Topic == null) return new APIGatewayProxyResponse
+                    {
+                        StatusCode = 400,
+                        Body = "Unable to process message"
+                    };
                 
-                var result = await clientCollection.ReplaceOneAsync(x => x.ConnectionId == connectionId, 
-                    client, new ReplaceOptions { IsUpsert = true });
+                context.Logger.LogLine($"Message: {message}");
                 
-                Console.WriteLine(result);
+                var client = await clientCollection.Find(c => c.ConnectionId == connectionId).FirstOrDefaultAsync();
+                if (client == null) return new APIGatewayProxyResponse
+                    {
+                        StatusCode = 400,
+                        Body = "Unable to subscribe to topic"
+                    };
+                
+                var currentSubscriptions = client.Subscriptions;
 
+                if (!currentSubscriptions.Contains(message.Topic))
+                {
+                    currentSubscriptions.Add(message.Topic.ToLower());
+                    var update = Builders<Client>.Update.Set(c => c.Subscriptions, currentSubscriptions);
+                    await clientCollection.FindOneAndUpdateAsync(x => x.ConnectionId == connectionId, update);
+                }
+                
                 return new APIGatewayProxyResponse
                 {
                     StatusCode = 200,
-                    Body = "Connected"
+                    Body = $"Subscribed to topic: {message.Topic}"
                 };
             }
             catch (Exception e)
