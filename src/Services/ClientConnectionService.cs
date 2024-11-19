@@ -32,4 +32,21 @@ public class ClientConnectionService : IClientConnectionService
         var result = await _clientsCollection.DeleteOneAsync(x => x.ConnectionId == connectionId);
         return result.IsAcknowledged;
     }
+
+    public async Task<bool> SubscribeToTopicByConnectionId(string connectionId, string topic)
+    {
+        if (string.IsNullOrWhiteSpace(topic)) return false;
+        
+        var client = await _clientsCollection.Find(c => c.ConnectionId == connectionId).FirstOrDefaultAsync();
+        if (client == null) return false;
+        var lowercaseTopic = topic.ToLower();
+                
+        var currentSubscriptions = client.Subscriptions;
+        if (currentSubscriptions.Contains(lowercaseTopic)) return true;
+
+        currentSubscriptions.Add(lowercaseTopic);
+        var update = Builders<Client>.Update.Set(c => c.Subscriptions, currentSubscriptions);
+        var result = await _clientsCollection.FindOneAndUpdateAsync(x => x.ConnectionId == connectionId, update);
+        return result != null;
+    }
 }
