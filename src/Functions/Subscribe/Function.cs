@@ -36,12 +36,12 @@ namespace Subscribe
             }
             
             var database = _mongoClient.GetDatabase("rebuild-test");
-            var clientCollection = database.GetCollection<Client>("Clients");
+            var clientCollection = database.GetCollection<Client>("clients");
             try
             {
                 var connectionId = request.RequestContext.ConnectionId;
                 context.Logger.LogLine($"ConnectionId: {connectionId}");
-                var client = new Client(connectionId, true);
+                var client = new Client(connectionId);
                 
                 var result = await clientCollection.ReplaceOneAsync(x => x.ConnectionId == connectionId, 
                     client, new ReplaceOptions { IsUpsert = true });

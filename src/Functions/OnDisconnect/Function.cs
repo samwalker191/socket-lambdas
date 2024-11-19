@@ -36,16 +36,13 @@ namespace OnDisconnect
             }
             
             var database = _mongoClient.GetDatabase("rebuild-test");
-            var clientCollection = database.GetCollection<Client>("Clients");
+            var clientCollection = database.GetCollection<Client>("clients");
             try
             {
                 var connectionId = request.RequestContext.ConnectionId;
                 context.Logger.LogLine($"ConnectionId: {connectionId}");
-                var update = Builders<Client>.Update.Set(x => x.Connected, false);
                 
-                var result = await clientCollection.FindOneAndUpdateAsync(x => x.ConnectionId == connectionId, update);
-                
-                Console.WriteLine(result);
+                var result = await clientCollection.DeleteOneAsync(x => x.ConnectionId == connectionId);
 
                 return new APIGatewayProxyResponse
                 {
