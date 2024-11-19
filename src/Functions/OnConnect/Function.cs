@@ -1,7 +1,7 @@
 ﻿using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
-using Domain;
-using MongoDB.Driver;
+using Services;
+using Services.Interfaces;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -10,20 +10,18 @@ namespace OnConnect
 {
     public class Function
     {
-        private static readonly string? ApiKey;
-        private static readonly MongoClient? MongoClient;
+        private static readonly string? ApiKey = Environment.GetEnvironmentVariable("API_KEY");
+        private static IClientConnectionService _clientConnectionService = null!;
 
-        private static MongoClient CreateMongoClient()
+        // Lambda invokes a parameterless constructor function when warming up
+        // Structuring it this way allows for mocks to be used for testing more easily
+        public Function(): this(null)
         {
-            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            if (string.IsNullOrEmpty(connectionString)) throw new ApplicationException("DB_CONNECTION_STRING environment variable is not defined");
-            return new MongoClient(connectionString);
         }
 
-        static Function()
+        public Function(IClientConnectionService? clientConnectionService)
         {
-            MongoClient = CreateMongoClient();
-            ApiKey = Environment.GetEnvironmentVariable("API_KEY");
+            _clientConnectionService = clientConnectionService ?? new ClientConnectionService();
         }
         public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
@@ -35,29 +33,15 @@ namespace OnConnect
                     Body = "Unauthorized" 
                 };
             }
-            
-            if (MongoClient == null)
-            {
-                context.Logger.LogError("Database client is not initialized");
-                return new APIGatewayProxyResponse
-                {
-                    StatusCode = 400,
-                    Body = "Failed to connect"
-                };
-            }
-            
-            var database = MongoClient.GetDatabase("rebuild-test");
-            var clientCollection = database.GetCollection<Client>("clients");
+
             try
             {
                 var connectionId = request.RequestContext.ConnectionId;
                 context.Logger.LogLine($"ConnectionId: {connectionId}");
-                var client = new Client(connectionId);
                 
-                var result = await clientCollection.ReplaceOneAsync(x => x.ConnectionId == connectionId, 
-                    client, new ReplaceOptions { IsUpsert = true });
+                var result = await _clientConnectionService.CreateClientConnection(connectionId);
                 
-                if (!result.IsAcknowledged) return new APIGatewayProxyResponse
+                if (!result) return new APIGatewayProxyResponse
                 {
                     StatusCode = 400,
                     Body = "Failed to connect" 
