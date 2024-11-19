@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Dotnet AWS Lambda Tools yml for deployment. Adapted from: https://github.com/normj/netcore-simple-websockets-chat-app/blob/master/template.yaml
+
+Resources:
+  OnConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Functions/OnConnect/
+      Handler: OnConnect::OnConnect.Function::FunctionHandler
+      MemorySize: 256
+      Timeout: 30
+      Runtime: dotnet8
+
+  OnDisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Functions/OnDisconnect/
+      Handler: OnDisconnect::OnDisconnect.Function::FunctionHandler
+      MemorySize: 256
+      Timeout: 30
+      Runtime: dotnet8
+      
+  DefaultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Functions/Default/
+      Handler: Default::Default.Function::FunctionHandler
+      MemorySize: 256
+      Timeout: 30
+      Runtime: dotnet8
+
+  SubscribeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Functions/Subscribe/
+      Handler: Subscribe::Subscribe.Function::FunctionHandler
+      MemorySize: 256
+      Timeout: 30
+      Runtime: dotnet8
+
+Outputs:
+  OnConnectFunctionArn:
+    Description: "OnConnect function ARN"
+    Value: !GetAtt OnConnectFunction.Arn
+
+  OnDisconnectFunctionArn:
+    Description: "OnDisconnect function ARN"
+    Value: !GetAtt OnDisconnectFunction.Arn
+
+  SubscribeFunctionArn:
+    Description: "Subscribe function ARN"
+    Value: !GetAtt SubscribeFunction.Arn
