@@ -10,7 +10,8 @@ namespace OnConnect
 {
     public class Function
     {
-        private static MongoClient? _mongoClient;
+        private static readonly string? ApiKey;
+        private static readonly MongoClient? MongoClient;
 
         private static MongoClient CreateMongoClient()
         {
@@ -21,11 +22,21 @@ namespace OnConnect
 
         static Function()
         {
-            _mongoClient = CreateMongoClient();
+            MongoClient = CreateMongoClient();
+            ApiKey = Environment.GetEnvironmentVariable("API_KEY");
         }
         public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
         {
-            if (_mongoClient == null)
+            if (!request.Headers.TryGetValue("x-api-key", out var apiKey) || ApiKey != apiKey)
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 401,
+                    Body = "Unauthorized" 
+                };
+            }
+            
+            if (MongoClient == null)
             {
                 context.Logger.LogError("Database client is not initialized");
                 return new APIGatewayProxyResponse
@@ -35,13 +46,13 @@ namespace OnConnect
                 };
             }
             
-            var database = _mongoClient.GetDatabase("rebuild-test");
-            var clientCollection = database.GetCollection<Client>("Clients");
+            var database = MongoClient.GetDatabase("rebuild-test");
+            var clientCollection = database.GetCollection<Client>("clients");
             try
             {
                 var connectionId = request.RequestContext.ConnectionId;
                 context.Logger.LogLine($"ConnectionId: {connectionId}");
-                var client = new Client(connectionId, true);
+                var client = new Client(connectionId);
                 
                 var result = await clientCollection.ReplaceOneAsync(x => x.ConnectionId == connectionId, 
                     client, new ReplaceOptions { IsUpsert = true });
