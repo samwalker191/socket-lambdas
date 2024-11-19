@@ -30,6 +30,7 @@ namespace Subscribe
             {
                 var connectionId = request.RequestContext.ConnectionId;
                 context.Logger.LogLine($"ConnectionId: {connectionId}");
+                context.Logger.LogLine($"Body: {request.Body}");
                 
                 var message = JsonConvert.DeserializeObject<SubscribeMessage>(request.Body);
                 if (message?.Topic == null) return new APIGatewayProxyResponse

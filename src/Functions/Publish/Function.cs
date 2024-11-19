@@ -22,7 +22,7 @@ namespace Publish
         {
             var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             if (string.IsNullOrEmpty(connectionString)) throw new ApplicationException("DB_CONNECTION_STRING environment variable is not defined");
-            return new MongoClient(connectionString); //dadwadawd
+            return new MongoClient(connectionString); 
         }
 
         static Function()
