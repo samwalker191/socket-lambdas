@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Functions\OnConnect\OnConnect.csproj" />
+    <ProjectReference Include="..\Functions\OnDisconnect\OnDisconnect.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 </Project>
