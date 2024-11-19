@@ -39,6 +39,22 @@ Resources:
       MemorySize: 256
       Timeout: 30
       Runtime: dotnet8
+      
+  PublishFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Functions/Publish/
+      Handler: Publish::Publish.Function::FunctionHandler
+      MemorySize: 256
+      Timeout: 30
+      Runtime: dotnet8
+    Policies:
+      - Statement:
+          - Effect: Allow
+            Action:
+              - 'execute-api:ManageConnections'
+            Resource:
+              - 'arn:aws:execute-api:*:*:*/production/POST/@connections/*'
 
 Outputs:
   OnConnectFunctionArn:
@@ -52,3 +68,11 @@ Outputs:
   SubscribeFunctionArn:
     Description: "Subscribe function ARN"
     Value: !GetAtt SubscribeFunction.Arn
+    
+  DefaultFunctionArn:
+    Description: "Default function ARN"
+    Value: !GetAtt DefaultFunction.Arn
+    
+  PublishFunctionArn:
+    Description: "Publish function ARN"
+    Value: !GetAtt PublishFunction.Arn
