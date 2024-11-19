@@ -1,5 +1,4 @@
 ﻿using Amazon.Lambda.APIGatewayEvents;
-using Amazon.Lambda.Core;
 using Amazon.Lambda.TestUtilities;
 using FluentAssertions;
 using Moq;
@@ -71,6 +70,7 @@ public class OnConnectFunctionTests
         
         // Act
         var failedResult = await functionToTest.FunctionHandler(apiGatewayProxyRequest!, context);
+        
         // Assert
         failedResult.StatusCode.Should().Be(500);
         failedResult.Body.Should().Contain("Failed to connect");

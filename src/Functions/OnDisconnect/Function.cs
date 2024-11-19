@@ -1,7 +1,5 @@
 ﻿using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
-using Domain;
-using MongoDB.Driver;
 using Services;
 using Services.Interfaces;
 
