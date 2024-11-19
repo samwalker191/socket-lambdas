@@ -26,4 +26,10 @@ public class ClientConnectionService : IClientConnectionService
 
         return result.IsAcknowledged;
     }
+
+    public async Task<bool> DeleteClientConnectionByConnectionId(string connectionId)
+    {
+        var result = await _clientsCollection.DeleteOneAsync(x => x.ConnectionId == connectionId);
+        return result.IsAcknowledged;
+    }
 }
