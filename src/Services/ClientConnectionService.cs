@@ -49,4 +49,10 @@ public class ClientConnectionService : IClientConnectionService
         var result = await _clientsCollection.FindOneAndUpdateAsync(x => x.ConnectionId == connectionId, update);
         return result != null;
     }
+
+    public async Task<List<Client>> GetClientsByTopic(string topic)
+    {
+        var filter = Builders<Client>.Filter.AnyEq(x => x.Subscriptions, topic.ToLower());
+        return await _clientsCollection.Find(filter).ToListAsync() ?? new List<Client>();
+    }
 }

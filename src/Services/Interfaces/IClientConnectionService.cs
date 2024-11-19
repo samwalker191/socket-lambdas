@@ -1,4 +1,6 @@
-﻿namespace Services.Interfaces;
+﻿using Domain;
+
+namespace Services.Interfaces;
 
 public interface IClientConnectionService
 {
@@ -7,4 +9,6 @@ public interface IClientConnectionService
     Task<bool> DeleteClientConnectionByConnectionId(string connectionId);
     
     Task<bool> SubscribeToTopicByConnectionId(string connectionId, string topic);
+    
+    Task<List<Client>> GetClientsByTopic(string topic);
 }

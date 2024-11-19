@@ -176,4 +176,39 @@ public class ClientConnectionServiceTests
         // Cleanup
         await _clientCollection.DeleteManyAsync(x => true);
     }
+
+    [Fact]
+    public async Task ShouldBeAbletoGetClientConnectionsByTopic()
+    {
+        // Arrange
+        var connectionId1 = "test-connection-id-1";
+        var connectionId2 = "test-connection-id-2";
+        var connectionId3 = "test-connection-id-3";
+        var topic1 ="test-subscription";
+        var topic2 ="test-subscription-2";
+        var newClientConnection1 = new Client(connectionId1)
+        {
+            Subscriptions = new List<string> { topic1 }
+        };
+        var newClientConnection2 = new Client(connectionId2)
+        {
+            Subscriptions = new List<string> { topic1 }
+        };
+        var newClientConnection3 = new Client(connectionId3)
+        {
+            Subscriptions = new List<string> { topic2 }
+        };
+        await _clientCollection.InsertOneAsync(newClientConnection1);
+        await _clientCollection.InsertOneAsync(newClientConnection2);
+        await _clientCollection.InsertOneAsync(newClientConnection3);
+        
+        // Act
+        var result = await _clientConnectionService.GetClientsByTopic(topic1);
+        
+        // Assert
+        result.Should().HaveCount(2);
+        
+        // Cleanup
+        await _clientCollection.DeleteManyAsync(x => true);
+    }
 }
