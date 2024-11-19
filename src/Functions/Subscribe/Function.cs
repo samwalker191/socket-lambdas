@@ -42,14 +42,13 @@ namespace Subscribe
             {
                 var connectionId = request.RequestContext.ConnectionId;
                 context.Logger.LogLine($"ConnectionId: {connectionId}");
+                
                 var message = JsonConvert.DeserializeObject<SubscribeMessage>(request.Body);
                 if (message?.Topic == null) return new APIGatewayProxyResponse
                     {
                         StatusCode = 400,
                         Body = "Unable to process message"
                     };
-                
-                context.Logger.LogLine($"Message: {message}");
                 
                 var client = await clientCollection.Find(c => c.ConnectionId == connectionId).FirstOrDefaultAsync();
                 if (client == null) return new APIGatewayProxyResponse
@@ -59,7 +58,6 @@ namespace Subscribe
                     };
                 
                 var currentSubscriptions = client.Subscriptions;
-
                 if (!currentSubscriptions.Contains(message.Topic))
                 {
                     currentSubscriptions.Add(message.Topic.ToLower());

@@ -57,8 +57,7 @@ namespace OnConnect
                 var result = await clientCollection.ReplaceOneAsync(x => x.ConnectionId == connectionId, 
                     client, new ReplaceOptions { IsUpsert = true });
                 
-                if (!result.IsAcknowledged) 
-                    return new APIGatewayProxyResponse
+                if (!result.IsAcknowledged) return new APIGatewayProxyResponse
                 {
                     StatusCode = 400,
                     Body = "Failed to connect" 
