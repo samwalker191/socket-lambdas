@@ -58,7 +58,7 @@ namespace Subscribe
                 return new APIGatewayProxyResponse
                 {
                     StatusCode = 500,
-                    Body = $"Failed to connect: {e.Message}" 
+                    Body = $"Failed to subscribe to topic: {e.Message}" 
                 };
             }
         }

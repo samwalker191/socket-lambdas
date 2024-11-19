@@ -29,6 +29,7 @@ public class OnDisconnectFunctionTests
         
         // Act
         var failedResult = await functionToTest.FunctionHandler(apiGatewayProxyRequest!, context);
+        
         // Assert
         failedResult.StatusCode.Should().Be(400);
         failedResult.Body.Should().Be("Unable to disconnect");
