@@ -1,5 +1,7 @@
 ﻿{
   "region": "us-west-1",
+  "s3-bucket": "socket-lambdas",
+  "stack-name": "socket-lambdas",
   "profile": "me",
   "template": "template.yml"
 }
