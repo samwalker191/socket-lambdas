@@ -44,8 +44,7 @@ namespace OnDisconnect
                 
                 var result = await clientCollection.DeleteOneAsync(x => x.ConnectionId == connectionId);
                 
-                if (!result.IsAcknowledged) 
-                    return new APIGatewayProxyResponse
+                if (!result.IsAcknowledged) return new APIGatewayProxyResponse
                     {
                         StatusCode = 400,
                         Body = "Unable to disconnect"
