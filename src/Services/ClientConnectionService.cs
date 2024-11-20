@@ -53,6 +53,6 @@ public class ClientConnectionService : IClientConnectionService
     public async Task<List<Client>> GetClientsByTopic(string topic)
     {
         var filter = Builders<Client>.Filter.AnyEq(x => x.Subscriptions, topic.ToLower());
-        return await _clientsCollection.Find(filter).ToListAsync() ?? new List<Client>();
+        return await _clientsCollection.Find(filter).ToListAsync();
     }
 }
