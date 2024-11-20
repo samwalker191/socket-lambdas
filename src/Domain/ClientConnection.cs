@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Domain;
 
-public class Client(string connectionId)
+public class ClientConnection(string connectionId)
 {
     [BsonIgnoreIfDefault]
     public ObjectId Id { get; set; }

@@ -78,18 +78,18 @@ namespace Publish
             }
         }
 
-        private static async Task PublishMessageToClient(ILambdaContext context, Client client, MemoryStream stream,
+        private static async Task PublishMessageToClient(ILambdaContext context, ClientConnection clientConnection, MemoryStream stream,
             AmazonApiGatewayManagementApiClient apiClient)
         {
             var postConnectionRequest = new PostToConnectionRequest
             {
-                ConnectionId = client.ConnectionId,
+                ConnectionId = clientConnection.ConnectionId,
                 Data = stream
             };
 
             try
             {
-                context.Logger.LogLine($"Post to connection: {client.ConnectionId}");
+                context.Logger.LogLine($"Post to connection: {clientConnection.ConnectionId}");
                 stream.Position = 0;
                 await apiClient.PostToConnectionAsync(postConnectionRequest);
             }
@@ -97,12 +97,12 @@ namespace Publish
             {
                 if (e.StatusCode == HttpStatusCode.Gone)
                 {
-                    context.Logger.LogLine($"Deleting gone connection: {client.ConnectionId}");
-                    await _clientConnectionService.DeleteClientConnectionByConnectionId(client.ConnectionId);
+                    context.Logger.LogLine($"Deleting gone connection: {clientConnection.ConnectionId}");
+                    await _clientConnectionService.DeleteClientConnectionByConnectionId(clientConnection.ConnectionId);
                 }
                 else
                 {
-                    context.Logger.LogLine($"Error posting message to {client.ConnectionId}: {e.Message}");
+                    context.Logger.LogLine($"Error posting message to {clientConnection.ConnectionId}: {e.Message}");
                     context.Logger.LogLine(e.StackTrace); 
                 }
             }

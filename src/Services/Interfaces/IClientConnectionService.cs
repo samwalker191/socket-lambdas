@@ -10,5 +10,5 @@ public interface IClientConnectionService
     
     Task<bool> SubscribeToTopicByConnectionId(string connectionId, string topic);
     
-    Task<List<Client>> GetClientsByTopic(string topic);
+    Task<List<ClientConnection>> GetClientsByTopic(string topic);
 }

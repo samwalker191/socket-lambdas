@@ -61,13 +61,13 @@ public class PublishFunctionTests
     public async Task ShouldReturnSuccessResponseWithValidRequest()
     {
         // Arrange
-        var client = new Client("banana")
+        var client = new ClientConnection("banana")
         {
             Subscriptions = new List<string> { "science " }
         };
         var mockClientConnectionService = new Mock<IClientConnectionService>();
         mockClientConnectionService.Setup(x => x.GetClientsByTopic(It.IsAny<string>()))
-            .ReturnsAsync(new List<Client> { client });
+            .ReturnsAsync(new List<ClientConnection> { client });
         
         var functionToTest = new Function(mockClientConnectionService.Object);
         

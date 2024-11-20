@@ -6,21 +6,21 @@ namespace Services;
 
 public class ClientConnectionService : IClientConnectionService
 {
-    private readonly IMongoCollection<Client> _clientsCollection;
+    private readonly IMongoCollection<ClientConnection> _clientsCollection;
 
     public ClientConnectionService()
     {
         var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
         if (string.IsNullOrEmpty(connectionString)) throw new ApplicationException("DB_CONNECTION_STRING environment variable is not defined");
         var mongoClient = new MongoClient(connectionString);
-        _clientsCollection = mongoClient.GetDatabase("rebuild-test").GetCollection<Client>("clients");
+        _clientsCollection = mongoClient.GetDatabase("rebuild-test").GetCollection<ClientConnection>("client-connections");
     }
     
     public async Task<bool> CreateClientConnection(string connectionId)
     {
         if (string.IsNullOrWhiteSpace(connectionId)) return false;
         
-        var client = new Client(connectionId);
+        var client = new ClientConnection(connectionId);
         var result = await _clientsCollection.ReplaceOneAsync(x => x.ConnectionId == connectionId, 
             client, new ReplaceOptions { IsUpsert = true });
 
@@ -45,14 +45,14 @@ public class ClientConnectionService : IClientConnectionService
         if (currentSubscriptions.Contains(lowercaseTopic)) return true;
 
         currentSubscriptions.Add(lowercaseTopic);
-        var update = Builders<Client>.Update.Set(c => c.Subscriptions, currentSubscriptions);
+        var update = Builders<ClientConnection>.Update.Set(c => c.Subscriptions, currentSubscriptions);
         var result = await _clientsCollection.FindOneAndUpdateAsync(x => x.ConnectionId == connectionId, update);
         return result != null;
     }
 
-    public async Task<List<Client>> GetClientsByTopic(string topic)
+    public async Task<List<ClientConnection>> GetClientsByTopic(string topic)
     {
-        var filter = Builders<Client>.Filter.AnyEq(x => x.Subscriptions, topic.ToLower());
+        var filter = Builders<ClientConnection>.Filter.AnyEq(x => x.Subscriptions, topic.ToLower());
         return await _clientsCollection.Find(filter).ToListAsync();
     }
 }

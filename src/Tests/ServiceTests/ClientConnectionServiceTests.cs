@@ -10,7 +10,7 @@ namespace Tests.ServiceTests;
 public class ClientConnectionServiceTests
 {
     private readonly IClientConnectionService _clientConnectionService;
-    private readonly IMongoCollection<Client> _clientCollection;
+    private readonly IMongoCollection<ClientConnection> _clientCollection;
 
     public ClientConnectionServiceTests()
     {
@@ -20,7 +20,7 @@ public class ClientConnectionServiceTests
         
         // for assertions 
         var mongoClient = new MongoClient("mongodb://localhost:27017");
-        _clientCollection = mongoClient.GetDatabase("rebuild-test").GetCollection<Client>("clients");
+        _clientCollection = mongoClient.GetDatabase("rebuild-test").GetCollection<ClientConnection>("client-connections");
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class ClientConnectionServiceTests
     {
         // Arrange
         var connectionId = "test-connection-id";
-        var newClientConnection = new Client(connectionId);
+        var newClientConnection = new ClientConnection(connectionId);
         await _clientCollection.InsertOneAsync(newClientConnection);
         
         // Act
@@ -89,7 +89,7 @@ public class ClientConnectionServiceTests
     {
         // Arrange
         var connectionId = "test-connection-id";
-        var newClientConnection = new Client(connectionId);
+        var newClientConnection = new ClientConnection(connectionId);
         await _clientCollection.InsertOneAsync(newClientConnection);
         var emptyTopic = "";
         
@@ -111,7 +111,7 @@ public class ClientConnectionServiceTests
         // Arrange
         var connectionId = "test-connection-id";
         var topic ="test-subscription";
-        var newClientConnection = new Client(connectionId)
+        var newClientConnection = new ClientConnection(connectionId)
         {
             Subscriptions = new List<string> { topic }
         };
@@ -154,7 +154,7 @@ public class ClientConnectionServiceTests
         var topic ="test-subscription";
         var newTopic = "sports";
         var newCapsTopic = "SCIencE";
-        var newClientConnection = new Client(connectionId)
+        var newClientConnection = new ClientConnection(connectionId)
         {
             Subscriptions = new List<string> { topic }
         };
@@ -186,15 +186,15 @@ public class ClientConnectionServiceTests
         var connectionId3 = "test-connection-id-3";
         var topic1 ="test-subscription";
         var topic2 ="test-subscription-2";
-        var newClientConnection1 = new Client(connectionId1)
+        var newClientConnection1 = new ClientConnection(connectionId1)
         {
             Subscriptions = new List<string> { topic1 }
         };
-        var newClientConnection2 = new Client(connectionId2)
+        var newClientConnection2 = new ClientConnection(connectionId2)
         {
             Subscriptions = new List<string> { topic1 }
         };
-        var newClientConnection3 = new Client(connectionId3)
+        var newClientConnection3 = new ClientConnection(connectionId3)
         {
             Subscriptions = new List<string> { topic2 }
         };
