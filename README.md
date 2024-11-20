@@ -1,6 +1,6 @@
 ## AWS Architecture
 
-[AWS Architecture](readme-assets/aws-arch.png)
+![AWS Architecture](readme-assets/aws-arch.png)
 
 ## Design Choices
 
