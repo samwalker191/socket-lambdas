@@ -27,7 +27,7 @@ public class SubscribeFunctionTests
         var context = new TestLambdaContext();
         
         // Act
-         var failedResult = await functionToTest.FunctionHandler(apiGatewayProxyRequest!, context);
+        var failedResult = await functionToTest.FunctionHandler(apiGatewayProxyRequest!, context);
          
         // Assert
         failedResult.StatusCode.Should().Be(400);
