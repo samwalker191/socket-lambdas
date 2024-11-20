@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Functions\Default\Default.csproj" />
     <ProjectReference Include="..\Functions\OnConnect\OnConnect.csproj" />
     <ProjectReference Include="..\Functions\OnDisconnect\OnDisconnect.csproj" />
     <ProjectReference Include="..\Functions\Publish\Publish.csproj" />
