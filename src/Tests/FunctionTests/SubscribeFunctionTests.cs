@@ -6,17 +6,13 @@ using Newtonsoft.Json;
 using Services.Interfaces;
 using Subscribe;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Tests.FunctionTests;
 
 public class SubscribeFunctionTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public SubscribeFunctionTests(ITestOutputHelper testOutputHelper)
+    public SubscribeFunctionTests()
     {
-        _testOutputHelper = testOutputHelper;
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", "mongodb://localhost:27017");
     }
     
