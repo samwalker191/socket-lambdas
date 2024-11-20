@@ -16,7 +16,7 @@ I went with MongoDB since it allows for an index on a list field. Finally, becau
 limit of this project, I chose to go with MongoDB due to my familiarity with it and its use in
 C#. 
 
-NOTE: As stated above, an index was created for the Subscriptions field of the mongo document. 
+NOTE: As stated above, an index was created for the `subscriptions` field of the mongo document. 
 Additionally, an index was created on the `connectionId` field in order to improve query performance
 since the code is executing queries to find a connection by the `connectionId` often.
 
